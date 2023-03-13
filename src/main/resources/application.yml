@@ -1,0 +1,59 @@
+server:
+  port: 9050
+  context-path: /fleet-app
+
+spring:
+  application:
+    name: tracking-service
+  profiles:
+    active: local
+  r2dbc:
+    properties:
+      schema: dbo
+  data:
+    r2dbc:
+      repositories:
+        enabled: true
+  kafka:
+    properties:
+      spring:
+        json:
+          trusted:
+            packages: all
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      properties:
+        spring:
+          json:
+            use:
+              type:
+                headers: false
+            value:
+              default:
+                type: com.fleet.management.tracking.model.TrackingDetails
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+fleet:
+  topic:
+    tracking-topic: geolocation-tracker
+logging:
+  level:
+    org.springframework: INFO
+    org.apache.kafka: ERROR
+
+---
+spring:
+  profiles: local
+  r2dbc:
+    url: r2dbc:postgresql://localhost:15432/FleetApp
+    username: postgres
+    password: password
+    initialization-mode: always
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    consumer:
+      group-id: tracking-service
