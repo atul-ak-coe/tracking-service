@@ -18,10 +18,10 @@ import java.time.Duration;
 @Slf4j
 public class ProducerService {
 
-    @Value(value = "${fleet.topic.tracking-topic}")
+    @Value(value = "${fleet.tracker.producer.topic.tracking-topic}")
     private String topic;
 
-    @Value(value = "${fleet.topic.retry-count}")
+    @Value(value = "${fleet.topic.producer.retry-count}")
     private long maxRetryCount;
 
     @NotNull

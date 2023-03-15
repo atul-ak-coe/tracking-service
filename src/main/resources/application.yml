@@ -38,9 +38,16 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
 
 fleet:
-  topic:
-    tracking-topic: geolocation-tracker
-    retry-count: 3
+  tracker:
+    producer:
+      retry-count: 3
+      topic:
+        tracking-topic: geolocation-tracker
+    consumer:
+      retry-count: 3
+      topic:
+        tracking-topic: geolocation-tracker
+
 logging:
   level:
     org.springframework: INFO
