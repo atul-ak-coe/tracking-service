@@ -1,6 +1,7 @@
 package com.fleet.management.tracking.config;
 
 import com.fleet.management.tracking.model.TrackingDetails;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
@@ -11,12 +12,16 @@ import reactor.kafka.receiver.ReceiverOptions;
 import java.util.Collections;
 
 @Configuration
+@Slf4j
 public class KafkaConsumerConfig {
 
     @Bean
     public ReceiverOptions<String, TrackingDetails> kafkaReceiverOptions(@Value(value = "${fleet.topic.tracking-topic}") String topic, KafkaProperties kafkaProperties) {
         ReceiverOptions<String, TrackingDetails> basicReceiverOptions = ReceiverOptions.create(kafkaProperties.buildConsumerProperties());
-        return basicReceiverOptions.subscription(Collections.singletonList(topic));
+        return basicReceiverOptions
+                .addAssignListener(assignments -> log.info("Assigned: " + assignments))
+                .commitBatchSize(1)
+                .subscription(Collections.singletonList(topic));
     }
 
     @Bean
