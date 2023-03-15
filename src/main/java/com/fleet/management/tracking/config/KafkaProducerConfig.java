@@ -1,6 +1,6 @@
 package com.fleet.management.tracking.config;
 
-import com.fleet.management.tracking.model.TrackingDetails;
+import com.fleet.management.tracking.dto.TrackingDetailsDTO;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,9 +13,9 @@ import java.util.Map;
 public class KafkaProducerConfig {
 
     @Bean
-    public ReactiveKafkaProducerTemplate<String, TrackingDetails> reactiveKafkaProducerTemplate(
+    public ReactiveKafkaProducerTemplate<String, TrackingDetailsDTO> reactiveKafkaProducerTemplate(
             KafkaProperties properties) {
         Map<String, Object> props = properties.buildProducerProperties();
-        return new ReactiveKafkaProducerTemplate<String, TrackingDetails>(SenderOptions.create(props));
+        return new ReactiveKafkaProducerTemplate<String, TrackingDetailsDTO>(SenderOptions.create(props));
     }
 }

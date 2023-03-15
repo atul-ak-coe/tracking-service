@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,13 +47,29 @@ public class TrackingServiceImpl implements TrackingService {
                 .collectList()
                 .switchIfEmpty(Mono.defer(() -> Mono.just(Collections.emptyList())))
                 .flatMap(coordinates -> addTrackingDetails(tracking, coordinates))
-                .map(this::evaluateRoute)
-                .map(t -> modelMapper.map(t, TrackingDetailsDTO.class));
+                .flatMap(this::prepareTrackingDetailsDTO)
+                .map(this::evaluateRoute);
     }
 
-    private TrackingDetails evaluateRoute(TrackingDetails trackingDetails) {
-        producerService.send(trackingDetails);
-        return trackingDetails;
+    private Mono<TrackingDetailsDTO> prepareTrackingDetailsDTO(TrackingDetails trackingDetails) {
+        return coordinateService.getAll(trackingDetails.getRouteId(), trackingDetails.getTrackingId())
+                .collectList()
+                .map(coordinateDetails -> getTrackingDetailsDTO(trackingDetails, coordinateDetails));
+    }
+
+    private TrackingDetailsDTO getTrackingDetailsDTO(TrackingDetails trackingDetails, List<CoordinateDetails> coordinateDetails) {
+        Map<Integer, Coordinate> coordinateMap = coordinateDetails.stream()
+                .collect(Collectors.toMap(CoordinateDetails::getStepNum, this::getCoordinate));
+
+        TrackingDetailsDTO trackingDetailsDTO = modelMapper.map(trackingDetails, TrackingDetailsDTO.class);
+        trackingDetailsDTO.setCoordinateList(coordinateMap);
+
+        return trackingDetailsDTO;
+    }
+
+    private TrackingDetailsDTO evaluateRoute(TrackingDetailsDTO trackingDetailsDTO) {
+        producerService.send(trackingDetailsDTO);
+        return trackingDetailsDTO;
     }
 
     private Mono<TrackingDetails> addTrackingDetails(TrackingDetailsDTO trackingDetailsDTO, List<CoordinateDetails> coordinates) {
@@ -69,14 +85,10 @@ public class TrackingServiceImpl implements TrackingService {
         List<Long> coordinateIds = coordinates.stream()
                 .map(CoordinateDetails::getCoordinateId)
                 .collect(Collectors.toList());
+
         trackingDetails.setCoordinates(coordinateIds);
 
         return trackingDetails;
-    }
-
-    private Flux<Coordinate> getCoordinates(CoordinateDetails coordinateDetails) {
-        return coordinateService.getAll(coordinateDetails.getRouteId(), coordinateDetails.getTrackingId())
-                .map(this::getCoordinate);
     }
 
     private Coordinate getCoordinate(CoordinateDetails coordinateDetails) {

@@ -1,5 +1,6 @@
 package com.fleet.management.tracking.service.delegate;
 
+import com.fleet.management.tracking.dto.TrackingDetailsDTO;
 import com.fleet.management.tracking.model.TrackingDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +19,12 @@ public class ProducerService {
     private String topic;
 
     @NotNull
-    private final ReactiveKafkaProducerTemplate<String, TrackingDetails> kafkaProducerTemplate;
+    private final ReactiveKafkaProducerTemplate<String, TrackingDetailsDTO> kafkaProducerTemplate;
 
-    public void send(TrackingDetails trackingDetails) {
-        log.info("send to topic={}, {}={},", topic, TrackingDetails.class.getSimpleName(), trackingDetails);
-        kafkaProducerTemplate.send(topic, trackingDetails)
-                .doOnSuccess(senderResult -> log.info("sent {} offset : {}", trackingDetails, senderResult.recordMetadata().offset()))
+    public void send(TrackingDetailsDTO trackingDetailsDTO) {
+        log.info("send to topic={}, {}={},", topic, TrackingDetails.class.getSimpleName(), trackingDetailsDTO);
+        kafkaProducerTemplate.send(topic, trackingDetailsDTO)
+                .doOnSuccess(senderResult -> log.info("sent {} offset : {}", trackingDetailsDTO, senderResult.recordMetadata().offset()))
                 .subscribe();
     }
 }

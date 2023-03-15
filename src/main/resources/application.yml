@@ -49,7 +49,7 @@ logging:
 spring:
   profiles: local
   r2dbc:
-    url: r2dbc:postgresql://localhost:15432/FleetApp
+    url: r2dbc:postgresql://localhost:5432/FleetApp
     username: postgres
     password: password
     initialization-mode: always

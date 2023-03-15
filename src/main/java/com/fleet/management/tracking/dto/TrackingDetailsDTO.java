@@ -2,9 +2,10 @@ package com.fleet.management.tracking.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fleet.management.tracking.constant.FuelLevel;
+import com.fleet.management.tracking.model.Coordinate;
 import lombok.*;
 
-import java.util.List;
+import java.util.Map;
 
 @Setter
 @Getter
@@ -29,5 +30,5 @@ public class TrackingDetailsDTO {
 
     private Double speedRate;
 
-    private List<Long> coordinateList;
+    private Map<Integer, Coordinate> coordinateList;
 }
