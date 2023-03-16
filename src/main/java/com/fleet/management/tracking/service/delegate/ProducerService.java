@@ -21,7 +21,7 @@ public class ProducerService {
     @Value(value = "${fleet.tracker.producer.topic.tracking-topic}")
     private String topic;
 
-    @Value(value = "${fleet.topic.producer.retry-count}")
+    @Value(value = "${fleet.tracker.producer.retry-count}")
     private long maxRetryCount;
 
     @NotNull

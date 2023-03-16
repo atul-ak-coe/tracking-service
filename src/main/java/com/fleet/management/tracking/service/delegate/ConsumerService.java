@@ -23,7 +23,7 @@ public class ConsumerService implements CommandLineRunner {
     @NotNull
     private final ReactiveKafkaConsumerTemplate<String, TrackingDetails> reactiveKafkaConsumerTemplate;
 
-    @Value(value = "${fleet.topic.consumer.retry-count}")
+    @Value(value = "${fleet.tracker.consumer.retry-count}")
     private long maxRetryCount;
 
     private Flux<TrackingDetails> consumer() {
